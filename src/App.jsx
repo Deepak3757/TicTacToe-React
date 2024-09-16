@@ -2,6 +2,13 @@ import { useState } from "react";
 import GameBoard from "./components/GameBoard";
 import Player from "./components/Player";
 import Log from "./components/Log";
+import { WINNING_COMBINATIONS } from "./winning-combinations";
+
+const initialGameBoard = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null]
+];
 
 
 function deriveActivePlayer(gameTurns){
@@ -14,6 +21,25 @@ function App() {
 
   const activePlayer=deriveActivePlayer(gameTurns);
 
+  let gameBoard=initialGameBoard;
+    for(const turn of gameTurns){
+        const {square, player}=turn;
+        const {row, col}=square;
+        gameBoard[row][col]=turn.player;
+    }
+
+  let winner=null;
+  for(const winning of WINNING_COMBINATIONS){
+    let firstSymbol=gameBoard[winning[0].row][winning[0].column];
+    let secondSymbol=gameBoard[winning[1].row][winning[1].column];
+    let thirdSymbol=gameBoard[winning[2].row][winning[2].column];
+    if(firstSymbol&&firstSymbol===secondSymbol&&secondSymbol===thirdSymbol){
+      winner=firstSymbol;
+      console.log(firstSymbol, " wins");
+    }
+    
+
+  }
 
   function handleSelectSquare(rowInd, colInd) {
 
@@ -43,7 +69,8 @@ function App() {
             isActive={activePlayer === "O"}
           />
         </ol>
-        <GameBoard onSelectSquare={handleSelectSquare} turns={gameTurns}/>
+        {winner&&<p>Winner is: {winner}!</p>}
+        <GameBoard onSelectSquare={handleSelectSquare} board={gameBoard}/>
       </div>
       <Log turns={gameTurns}/>
     </main>
